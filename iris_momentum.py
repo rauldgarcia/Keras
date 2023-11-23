@@ -3,6 +3,7 @@ import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import History
+from keras.optimizers import SGD
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
@@ -30,7 +31,9 @@ model.add(Dense(4, input_dim=4, activation='relu'))
 model.add(Dense(2, activation='relu'))
 model.add(Dense(3, activation='sigmoid'))
 
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+#optimizer = SGD(learning_rate=0.01, momentum=0.6)
+optimizer = SGD(learning_rate=0.01, momentum=0.9)
+model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=2000, shuffle=True, callbacks=[history])
 result = model.evaluate(x_test, y_test)
 
