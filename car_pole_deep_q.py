@@ -82,7 +82,7 @@ def eps_decay(i,
     inew = min(i, annealig_stop)
     return (start * (annealig_stop - inew) + stop * inew) / annealig_stop
 
-env = gym.make('CartPole-v0')
+env = gym.make('CartPole-v1')
 q = DQN(env, hidden_size=16)
 
 train_episodes = 30 # Max number of episodes to learn from
@@ -105,11 +105,12 @@ learning_curve = [] # This is top collect the total rewards while training
 
 for ep in range(1, train_episodes+1):
     done = False
+    terminate = False
     state, _ = env.reset()
     eps = eps_decay(ep, explore_start, explore_stop, annealing_stop)
     total_return = 0 # Calculate return in each episode
 
-    while not done:
+    while (not done) and (not terminate):
         #average_return += 1
         if eps > np.random.rand():
             action = env.action_space.sample()

@@ -1,11 +1,13 @@
 import gym
 import numpy as np
+import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+from keras.optimizers import Adam
+from keras.callbacks import History
+import statistics
 
-env = gym.make('CartPole-v1', render_mode='human')
-
-pvariance = 0.1 # Variance of initial parameters
-ppvariance = 0.02 # Variance of pertubations
-nhiddens = 5 # Number of internal neurons
+env = gym.make('CartPole-v1')
 
 ninputs = env.observation_space.shape[0]
 if (isinstance(env.action_space, gym.spaces.box.Box)):
@@ -13,32 +15,45 @@ if (isinstance(env.action_space, gym.spaces.box.Box)):
 else:
     noutputs = env.action_space.n
 
-w1 = np.random.randn(nhiddens, ninputs) * pvariance
-w2 = np.random.randn(noutputs, nhiddens) * pvariance
-b1 = np.zeros(shape=(nhiddens,1))
-b2 = np.zeros(shape=(nhiddens,1))
+print(ninputs)
+print(noutputs)
 
-observation, info = env.reset(seed=42)
+history = History()
+model = Sequential()
+model.add(Dense(5, input_dim=ninputs, activation='relu'))
+model.add(Dense(5, activation='relu'))
+model.add(Dense(noutputs, activation='sigmoid'))
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.summary()
 
-for _ in range(200):
-    env.render()
-    print('Observation: ', observation, ' info: ', info)
+observation, info = env.reset()
+rewards = []
+for episode in range(30):
+    print('Episode: ', episode)
+    total_reward = 0
 
-    observation.resizq(ninputs, 1)
-    z1 = np.dot(w1, observation) + b1
-    a1 = np.tanh(z1)
-    z2 = np.dot(w2, a1) + b2
-    a2 = np.tanh(z2)
+    for _ in range(500):
+        
+        #print('Observation: ', observation, ' info: ', info)
+        observation = np.reshape(observation, [1, len(observation)])
+        action = model.predict(observation)
 
-    if (isinstance(env.action_space, gym.spaces.box.Box)):
-        action = a2
-    else:
-        action = np.argmax(a2)
+        if (isinstance(env.action_space, gym.spaces.box.Box)):
+            action = action
+        else:
+            action = np.argmax(action)
 
-    observation, reward, terminated, truncated, info = env.step(env.action_space.sample())
-    print('Reward: ', reward, ' Terminated: ', terminated, 'Trucated', truncated)
+        observation, reward, terminated, truncated, info = env.step(env.action_space.sample())
+        #print('Reward: ', reward, ' Terminated: ', terminated, 'Trucated', truncated)
+        total_reward += reward
 
-    if terminated or truncated:
-        observation, info = env.reset()
+        if terminated or truncated:
+            observation, info = env.reset()
+            break
+    
+    rewards.append(total_reward)
 
+print(statistics.mean(rewards))
 env.close()
+plt.plot(rewards)
+plt.show()
