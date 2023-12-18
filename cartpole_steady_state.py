@@ -115,4 +115,33 @@ for g in range(generations):
         networks.pop()
 
 print(networks)
-env.close()
+
+model = networks[0][0]
+
+# Evaluate the model
+observation, info = env.reset()
+rewards = []
+for episode in range(30):
+    total_reward = 0
+
+    for _ in range(200):
+        observation = np.reshape(observation, [1, len(observation)])
+        action = model.predict(observation)
+
+        if (isinstance(env.action_space, gym.spaces.box.Box)):
+            action = action
+        else:
+            action = np.argmax(action)
+
+        observation, reward, terminated, truncated, info = env.step(env.action_space.sample())
+        total_reward += reward
+
+        if terminated or truncated:
+            observation, info = env.reset()
+            break
+    
+    rewards.append(total_reward)
+
+print(statistics.mean(rewards))
+plt.plot(rewards)
+plt.show()
