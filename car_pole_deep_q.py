@@ -5,6 +5,9 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.optimizers import Adam
 from collections import deque
+import time
+
+begin = time.time()
 
 class DQN:
     def __init__(self,
@@ -142,5 +145,12 @@ for ep in range(1, train_episodes+1):
         print('Episode', ep, 'avg return', total_return)
     learning_curve.append(total_return)
 
+print("The running time is: ")
+end = time.time()
+print(end - begin)
+
 plt.plot(learning_curve)
+plt.title("Rewards from the best model trained with Deep Q Learning.")
+plt.ylabel('Rewards')
+plt.xlabel('Episodes')
 plt.show()

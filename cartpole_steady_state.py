@@ -5,6 +5,9 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.optimizers import Adam
 import statistics
+import time
+
+begin = time.time()
 
 env = gym.make('CartPole-v1')
 
@@ -25,8 +28,8 @@ for network in range(population_size):
 
     # Create the model
     model = Sequential()
-    model.add(Dense(5, input_dim=ninputs, activation='relu'))
-    model.add(Dense(5, activation='relu'))
+    model.add(Dense(16, input_dim=ninputs, activation='relu'))
+    model.add(Dense(16, activation='relu'))
     model.add(Dense(noutputs, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
@@ -76,9 +79,9 @@ for g in range(generations):
         # Create the model
         model_new = Sequential()
         weights_1 = np.random.normal(0, mutation_step_size, (rows_1, columns_1))
-        model_new.add(Dense(5, input_dim=ninputs, activation='relu', weights=[weights_1, np.ones(columns_1)]))
+        model_new.add(Dense(16, input_dim=ninputs, activation='relu', weights=[weights_1, np.ones(columns_1)]))
         weights_2 = np.random.normal(0, mutation_step_size, (rows_2, columns_2))
-        model_new.add(Dense(5, activation='relu', weights=[weights_2, np.ones(columns_2)]))
+        model_new.add(Dense(16, activation='relu', weights=[weights_2, np.ones(columns_2)]))
         weights_3 = np.random.normal(0, mutation_step_size, (rows_3, columns_3))
         model_new.add(Dense(noutputs, activation='sigmoid', weights=[weights_3, np.ones(columns_3)]))
         model_new.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -142,6 +145,13 @@ for episode in range(30):
     
     rewards.append(total_reward)
 
+print("The running time is: ")
+end = time.time()
+print(end - begin)
+
 print(statistics.mean(rewards))
 plt.plot(rewards)
+plt.title("Rewards from the best model trained with Steady State algorithm.")
+plt.ylabel('Rewards')
+plt.xlabel('Episodes')
 plt.show()
