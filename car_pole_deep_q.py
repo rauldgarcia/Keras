@@ -81,9 +81,10 @@ def create_experience(replaybuffer, eps=0.1, max_episodes=1000):
 def eps_decay(i,
               start=1.0,
               stop=0.01,
-              annealig_stop=1000):
-    inew = min(i, annealig_stop)
-    return (start * (annealig_stop - inew) + stop * inew) / annealig_stop
+              annealing_stop=1000):
+    
+    inew = min(i, annealing_stop)
+    return (start * (annealing_stop - inew) + stop * inew) / annealing_stop
 
 env = gym.make('CartPole-v1')
 q = DQN(env, hidden_size=16)

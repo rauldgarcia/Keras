@@ -6,6 +6,7 @@ from keras.layers import Dense, Activation
 from keras.optimizers import Adam
 import statistics
 import time
+import copy
 
 begin = time.time()
 
@@ -75,14 +76,20 @@ networks.sort(key=lambda x:x[1], reverse=True)
 
 for g in range(generations):
     for l in range(int(population_size/2)):
+        # Obtain the weights of the model before and add de randoms
+        # posible error en la obtención de los pesos de la red, revisar cartpole_ga
+        ac_model = networks[l][0]
+        weights_1 = copy.deepcopy(ac_model.layers[0].get_weights()[0])
+        weights_2 = copy.deepcopy(ac_model.layers[1].get_weights()[0])
+        weights_3 = copy.deepcopy(ac_model.layers[2].get_weights()[0])
 
         # Create the model
         model_new = Sequential()
-        weights_1 = np.random.normal(0, mutation_step_size, (rows_1, columns_1))
+        weights_1 += np.random.normal(0, mutation_step_size, (rows_1, columns_1))
         model_new.add(Dense(16, input_dim=ninputs, activation='relu', weights=[weights_1, np.ones(columns_1)]))
-        weights_2 = np.random.normal(0, mutation_step_size, (rows_2, columns_2))
+        weights_2 += np.random.normal(0, mutation_step_size, (rows_2, columns_2))
         model_new.add(Dense(16, activation='relu', weights=[weights_2, np.ones(columns_2)]))
-        weights_3 = np.random.normal(0, mutation_step_size, (rows_3, columns_3))
+        weights_3 += np.random.normal(0, mutation_step_size, (rows_3, columns_3))
         model_new.add(Dense(noutputs, activation='sigmoid', weights=[weights_3, np.ones(columns_3)]))
         model_new.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_new.summary()
@@ -110,12 +117,13 @@ for g in range(generations):
                     break
             
             rewards.append(total_reward)
-        networks.append([model_new, statistics.mean(rewards)])
-
+        networks[int(population_size/2)+l] = [model_new, statistics.mean(rewards)]
+        #networks.append([model_new, statistics.mean(rewards)])
+    
     networks.sort(key=lambda x:x[1], reverse=True)
 
-    for l in range(int(population_size/2)):
-        networks.pop()
+    '''for l in range(int(population_size/2)):
+        networks.pop()'''
 
 print(networks)
 
