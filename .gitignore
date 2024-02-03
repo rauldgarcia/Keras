@@ -2,3 +2,6 @@ rossmann-store-sales
 predicting-red-hat-business-value
 iris.csv
 diabetes.txt
+act_test.csv
+act_train.csv
+people.csv

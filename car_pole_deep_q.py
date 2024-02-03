@@ -6,6 +6,7 @@ from keras.layers import Dense, Activation
 from keras.optimizers import Adam
 from collections import deque
 import time
+import statistics
 
 begin = time.time()
 
@@ -114,7 +115,7 @@ for ep in range(1, train_episodes+1):
     eps = eps_decay(ep, explore_start, explore_stop, annealing_stop)
     total_return = 0 # Calculate return in each episode
 
-    while (not done) and (not terminate):
+    while (not done):
         #average_return += 1
         if eps > np.random.rand():
             action = env.action_space.sample()
@@ -149,6 +150,8 @@ for ep in range(1, train_episodes+1):
 print("The running time is: ")
 end = time.time()
 print(end - begin)
+
+print(statistics.mean(learning_curve))
 
 plt.plot(learning_curve)
 plt.title("Rewards from the best model trained with Deep Q Learning.")
